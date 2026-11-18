@@ -36,7 +36,7 @@ body {
   font-size: 17px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  overflow-x: clip; /* clip, not hidden: hidden turns <body> into a second scroll container */
 }
 
 img { max-width: 100%; display: block; }
@@ -94,13 +94,18 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   transition: background 0.3s, box-shadow 0.3s, padding 0.3s;
   padding: 22px 0;
 }
-.site-header.is-scrolled {
+/* The frosted background lives on a pseudo-element: backdrop-filter on the header
+   itself would become the containing block for the fixed mobile menu and trap it. */
+.site-header::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
   background: rgba(250, 246, 240, 0.86);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   box-shadow: 0 1px 0 var(--line);
-  padding: 12px 0;
+  opacity: 0; transition: opacity 0.3s;
 }
+.site-header.is-scrolled { padding: 12px 0; }
+.site-header.is-scrolled::before { opacity: 1; }
 .header-inner { display: flex; align-items: center; justify-content: space-between; }
 .logo { font-family: var(--font-display); font-weight: 700; font-size: 24px; letter-spacing: -0.04em; display: flex; align-items: center; }
 .logo-mark {

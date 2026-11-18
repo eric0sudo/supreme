@@ -20,8 +20,20 @@
     nav.classList.toggle("is-open", open);
     toggle.setAttribute("aria-expanded", String(open));
     toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
-    document.body.style.overflow = open ? "hidden" : "";
+    // <html> is the page scroller, so lock scrolling there while the menu is open
+    document.documentElement.style.overflow = open ? "hidden" : "";
   };
+
+  // "Back to top" / logo: always scroll to the very top, and clean the URL hash
+  $$('a[href="#top"]').forEach((a) =>
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      setNav(false);
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+      history.replaceState(null, "", location.pathname + location.search);
+    })
+  );
   toggle.addEventListener("click", () => setNav(!nav.classList.contains("is-open")));
   $$("a", nav).forEach((a) => a.addEventListener("click", () => setNav(false)));
   document.addEventListener("keydown", (e) => e.key === "Escape" && setNav(false));
